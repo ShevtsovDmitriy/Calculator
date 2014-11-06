@@ -51,7 +51,7 @@ public class Parser {
             number += current();
             next();
         }
-        if (number == ""){
+        if (number.equals("")){
             throw new Exception("Ожидалось число");
         }
         Node result = new Node(nodeType.num, number);
