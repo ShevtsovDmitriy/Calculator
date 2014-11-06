@@ -1,11 +1,13 @@
 package Parser;
 
+import java.util.Vector;
+
 /**
  * Created by Дмитрий on 01.11.2014.
  */
 public class Parser {
 
-    public static enum nodeType{add, sub, mult, div, pow, func, num, block }
+    public static enum nodeType{add, sub, mult, div, pow, func, num, expr  }
 
     String expression = "";
     int pos = 0;
@@ -14,25 +16,33 @@ public class Parser {
 
     }
 
-    public void parse(String expression){
+    public void parse(String expression) throws Exception {
         expression = expression.replaceAll(" ", "");
         this.expression = expression;
         BracketAnalyzer analyzer = new BracketAnalyzer();
         System.out.print(analyzer.analyze(expression));
+        NodePrinter.astNodeToAdvancedDosStringTree(expr());
     }
 
-    private boolean isMatched(String pattern){
-        return expression.indexOf(pattern, pos) == pos;
+    private boolean isMatched(String... pattern){
+        for (String aPattern : pattern) {
+            return expression.indexOf(aPattern, pos) == pos;
+        }
+        return false;
     }
 
     private char current(){
         return expression.charAt(pos);
     }
 
-    private void match(String str){
-        if (isMatched(str)) {
-            pos += str.length();
+    private String  match(String... str){
+        for(String aStr: str) {
+            if (isMatched(aStr)) {
+                pos += aStr.length();
+                return aStr;
+            }
         }
+        return "";
     }
 
     private boolean isEnd(){
@@ -42,6 +52,7 @@ public class Parser {
     private void next(){
         if (!isEnd()){
             pos++;
+            System.out.print("\nit is not end");
         }
     }
 
@@ -50,9 +61,12 @@ public class Parser {
         while (Character.isDigit(current())){
             number += current();
             next();
+
         }
+        System.out.print("\n"+number + " is current number");
         if (number.equals("")){
-            throw new Exception("Ожидалось число");
+            System.out.print("\n" + number + " number not found");
+            throw new Exception("Number expected");
         }
         return new Node(nodeType.num, number);
     }
@@ -61,14 +75,36 @@ public class Parser {
 
         if (isMatched("(")){
             match("(");
-            Node result = block();
+            Node result = add();
             match(")");
+            return result;
         }
         return number();
     }
 
     private Node mult() throws Exception {
-        return number();
+        return block();
     }
+
+    private Node add() throws Exception {
+        Node result = mult();
+        while (isMatched("+", "-")){
+            String operation = match("+", "-");
+            Node tmp = mult();
+            result = operation=="+" ? new Node(nodeType.add, result, tmp)
+                    :new Node(nodeType.sub, result, tmp);
+        }
+
+        return result;
+    }
+
+    private Node expr() throws Exception {
+        Node top = new Node(nodeType.expr);
+        while (!isEnd()){
+            top.addChild(add());
+        }
+        return top;
+    }
+
 
 }
