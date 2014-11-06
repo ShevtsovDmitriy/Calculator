@@ -54,8 +54,7 @@ public class Parser {
         if (number.equals("")){
             throw new Exception("Ожидалось число");
         }
-        Node result = new Node(nodeType.num, number);
-        return result;
+        return new Node(nodeType.num, number);
     }
 
     private Node block() throws Exception {
