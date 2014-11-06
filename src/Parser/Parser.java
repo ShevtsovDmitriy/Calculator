@@ -1,9 +1,8 @@
 package Parser;
 
-import java.util.Vector;
-
 /**
  * Created by Дмитрий on 01.11.2014.
+ * String parser. Can parse math expressions
  */
 public class Parser {
 
@@ -35,7 +34,7 @@ public class Parser {
         if (!isEnd()) {
             return expression.charAt(pos);
         }
-        throw new Exception("Index Out Of Bounds in current");
+        throw new Exception("Index Out Of Bounds in current, pos = " + pos);
     }
 
     private String  match(String... str){
