@@ -31,8 +31,11 @@ public class Parser {
         return false;
     }
 
-    private char current(){
-        return expression.charAt(pos);
+    private char current() throws Exception {
+        if (!isEnd()) {
+            return expression.charAt(pos);
+        }
+        throw new Exception("Index Out Of Bounds in current");
     }
 
     private String  match(String... str){
@@ -46,17 +49,17 @@ public class Parser {
     }
 
     private boolean isEnd(){
-        return pos == expression.length();
+        return pos == expression.length() - 1;
     }
 
     private void next(){
         if (!isEnd()){
             pos++;
-            System.out.print("\nit is not end");
         }
     }
 
     private Node number() throws Exception {
+        System.out.print("\n in number \n");
         String number = "";
         while (Character.isDigit(current())){
             number += current();
@@ -65,16 +68,16 @@ public class Parser {
         }
         System.out.print("\n"+number + " is current number");
         if (number.equals("")){
-            System.out.print("\n" + number + " number not found");
             throw new Exception("Number expected");
         }
         return new Node(nodeType.num, number);
     }
 
     private Node block() throws Exception {
-
+        System.out.print("\n in block \n");
         if (isMatched("(")){
             match("(");
+            System.out.print("\n in block, call add \n");
             Node result = add();
             match(")");
             return result;
@@ -83,24 +86,36 @@ public class Parser {
     }
 
     private Node mult() throws Exception {
-        return block();
+        System.out.print("\n in mult, call block \n");
+        Node result = block();
+        while (isMatched("*", "/")){
+            String operation = match("*", "/");
+            System.out.print("\n in mult, call mult \n");
+            Node tmp = mult();
+            result = operation.equals("*") ? new Node(nodeType.mult, result, tmp)
+                    :new Node(nodeType.div, result, tmp);
+        }
+        return result;
     }
 
     private Node add() throws Exception {
+        System.out.print("\n in add, call mult_1 \n");
         Node result = mult();
         while (isMatched("+", "-")){
             String operation = match("+", "-");
+            System.out.print("\n in expr, call mult_2 \n");
             Node tmp = mult();
-            result = operation=="+" ? new Node(nodeType.add, result, tmp)
+            result = operation.equals("+") ? new Node(nodeType.add, result, tmp)
                     :new Node(nodeType.sub, result, tmp);
         }
-
         return result;
     }
 
     private Node expr() throws Exception {
+        System.out.print("\n in expr \n");
         Node top = new Node(nodeType.expr);
         while (!isEnd()){
+            System.out.print("\n in expr, call add \n");
             top.addChild(add());
         }
         return top;
