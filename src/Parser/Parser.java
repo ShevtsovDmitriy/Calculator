@@ -68,8 +68,7 @@ public class Parser {
     }
 
     private Node mult() throws Exception {
-        Node left = number();
-        return left;
+        return number();
     }
 
 }
