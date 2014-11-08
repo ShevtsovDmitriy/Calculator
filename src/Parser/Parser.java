@@ -20,7 +20,7 @@ public class Parser {
         this.expression = expression;
         BracketAnalyzer analyzer = new BracketAnalyzer();
         System.out.print(analyzer.analyze(expression));
-        NodePrinter.astNodeToAdvancedDosStringTree(expr());
+
     }
 
     private boolean isMatched(String... pattern){
@@ -57,67 +57,50 @@ public class Parser {
         }
     }
 
-    private Node number() throws Exception {
-        System.out.print("\n in number \n");
-        String number = "";
-        while (Character.isDigit(current())){
-            number += current();
-            next();
-
-        }
-        System.out.print("\n"+number + " is current number");
-        if (number.equals("")){
-            throw new Exception("Number expected");
-        }
-        return new Node(nodeType.num, number);
-    }
-
-    private Node block() throws Exception {
-        System.out.print("\n in block \n");
-        if (isMatched("(")){
+    private void mult(Node parent){
+        if (!isEnd() && isMatched("(")){
             match("(");
-            System.out.print("\n in block, call add \n");
-            Node result = add();
-            match(")");
-            return result;
+            expression(parent);
+            if (isMatched(")"))
+                match(")");
+            else System.out.print("Что-то не так со скобками");
         }
-        return number();
+
+
     }
 
-    private Node mult() throws Exception {
-        System.out.print("\n in mult, call block \n");
-        Node result = block();
-        while (isMatched("*", "/")){
-            String operation = match("*", "/");
-            System.out.print("\n in mult, call mult \n");
-            Node tmp = mult();
-            result = operation.equals("*") ? new Node(nodeType.mult, result, tmp)
-                    :new Node(nodeType.div, result, tmp);
+    private void summ(Node parent){
+        if (parent == null){
+            mult(parent);
         }
-        return result;
+        if (!isEnd() && !isMatched(")")){
+            if (isMatched("+", "-")) {
+                Node tmp = parent;
+                if (isMatched("+")) {
+                    match("+");
+                    parent = new Node(nodeType.add, tmp);
+                } else {
+                    match("-");
+                    parent = new Node(nodeType.sub, tmp);
+                }
+            }
+            else {System.out.print("Что-то не так");}
+            if (!isEnd() && !isMatched(")")){
+                Node tmp = new Node(nodeType.num);
+                mult(tmp);
+                if (parent != null) {
+                    parent.addChild(tmp);
+                }
+            }
+            else {System.out.print("Неожиданный конец строки");}
+        }
     }
 
-    private Node add() throws Exception {
-        System.out.print("\n in add, call mult_1 \n");
-        Node result = mult();
-        while (isMatched("+", "-")){
-            String operation = match("+", "-");
-            System.out.print("\n in expr, call mult_2 \n");
-            Node tmp = mult();
-            result = operation.equals("+") ? new Node(nodeType.add, result, tmp)
-                    :new Node(nodeType.sub, result, tmp);
-        }
-        return result;
-    }
-
-    private Node expr() throws Exception {
-        System.out.print("\n in expr \n");
-        Node top = new Node(nodeType.expr);
+    private Node expression(Node parent){
         while (!isEnd()){
-            System.out.print("\n in expr, call add \n");
-            top.addChild(add());
+            summ(parent);
         }
-        return top;
+        return parent;
     }
 
 

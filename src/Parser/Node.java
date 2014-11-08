@@ -5,6 +5,7 @@ import java.util.Collections;
 
 /**
  * Created by Дмитрий on 01.11.2014.
+ * Element of AST
  */
 public class Node {
 
@@ -44,4 +45,7 @@ public class Node {
         return children.size();
     }
 
+    public Parser.nodeType getType() {
+        return type;
+    }
 }
