@@ -10,6 +10,7 @@ public class Parser {
 
     String expression = "";
     int pos = 0;
+    Node head;
 
     public Parser(){
 
@@ -57,7 +58,12 @@ public class Parser {
         }
     }
 
-    private void mult(Node parent){
+    private Node num(Node parent){
+
+    }
+
+    private Node mult(Node parent){
+        boolean negative = false;
         if (!isEnd() && isMatched("(")){
             match("(");
             expression(parent);
@@ -65,40 +71,45 @@ public class Parser {
                 match(")");
             else System.out.print("Что-то не так со скобками");
         }
+        else {
+            if (!isEnd() && isMatched("-"))
+            {
+                negative = true;
+                match("-");
+            }
+
+        }
 
 
     }
 
-    private void summ(Node parent){
-        if (parent == null){
-            mult(parent);
-        }
+    private Node summ(Node parent){
+        if (parent == null) parent = mult(parent);
         if (!isEnd() && !isMatched(")")){
             if (isMatched("+", "-")) {
                 Node tmp = parent;
                 if (isMatched("+")) {
-                    match("+");
-                    parent = new Node(nodeType.add, tmp);
+                    parent = new Node(nodeType.add, match("+"),tmp);
                 } else {
-                    match("-");
-                    parent = new Node(nodeType.sub, tmp);
+                    parent = new Node(nodeType.sub, match("-"),tmp);
                 }
             }
             else {System.out.print("Что-то не так");}
             if (!isEnd() && !isMatched(")")){
                 Node tmp = new Node(nodeType.num);
-                mult(tmp);
+                tmp = mult(tmp);
                 if (parent != null) {
                     parent.addChild(tmp);
                 }
             }
             else {System.out.print("Неожиданный конец строки");}
         }
+        return parent;
     }
 
     private Node expression(Node parent){
         while (!isEnd()){
-            summ(parent);
+            parent = summ(parent);
         }
         return parent;
     }

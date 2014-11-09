@@ -34,7 +34,7 @@ public class Node {
         }
     }
 
-    public Node getGhidren(int index){
+    public Node getChild(int index){
         if (children.size() > index){
             return children.get(index);
         }

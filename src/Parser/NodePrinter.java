@@ -25,7 +25,7 @@ public class NodePrinter {
             }
         result += node + "\n";
         for(int i = 0; i < node.childCount(); i++)
-            result += getStringSubTree(node.getGhidren(i), indent, false);
+            result += getStringSubTree(node.getChild(i), indent, false);
 
         return result;
     }
