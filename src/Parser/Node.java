@@ -13,6 +13,8 @@ public class Node {
     private String value;
     private ArrayList<Node> children = new ArrayList<Node>();
 
+    public Node(){}
+
     public Node(Parser.nodeType nodeType, Node... child){
         this.type = nodeType;
         if (nodeType == Parser.nodeType.add || nodeType == Parser.nodeType.div || nodeType == Parser.nodeType.mult

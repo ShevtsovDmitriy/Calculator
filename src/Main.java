@@ -5,18 +5,10 @@ import Parser.*;
  */
 public class Main {
     public static void main(String[] args) throws Exception {
-        //Parser parser = new Parser();
-        //parser.parse("2+3");
-
-        Node nd = new Node(Parser.nodeType.num);
-        some(nd);
-        System.out.print(nd.getType());
+        Parser parser = new Parser();
+        parser.parse("2+3*4*5+1");
 
 
-    }
-    public static void some(Node node){
-        System.out.print(node.getType());
-        node = new Node(Parser.nodeType.add);
-        System.out.print(node.getType());
+
     }
 }
