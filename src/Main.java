@@ -6,9 +6,6 @@ import Parser.*;
 public class Main {
     public static void main(String[] args) throws Exception {
         Parser parser = new Parser();
-        parser.parse("2+3*4*5+1");
-
-
-
+        parser.parse("10/5-1+2*6+2+3");
     }
 }

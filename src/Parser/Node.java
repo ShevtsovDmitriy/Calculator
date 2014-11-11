@@ -43,6 +43,10 @@ public class Node {
         return null;
     }
 
+    public String getValue() {
+        return value;
+    }
+
     public int childCount(){
         return children.size();
     }

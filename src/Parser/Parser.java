@@ -20,14 +20,17 @@ public class Parser {
         expression = expression.replaceAll(" ", "");
         this.expression = expression;
         BracketAnalyzer analyzer = new BracketAnalyzer();
-        System.out.print(analyzer.analyze(expression));
-        head = expression(head);
+        if(analyzer.analyze(expression)) {
+            head = expression(head);
+            System.out.print(interpreter(head));
+        }
+        else System.out.print("Bracket errors");
 
     }
 
     private boolean isMatched(String... pattern){
         for (String aPattern : pattern) {
-            return expression.indexOf(aPattern, pos) == pos;
+            if(expression.indexOf(aPattern, pos) == pos) return true;
         }
         return false;
     }
@@ -93,8 +96,8 @@ public class Parser {
             else {
                 while (isMatched("*", "/")) {
                     Node tmp = num;
-                    if (isMatched("*")) parent = new Node(nodeType.mult, match("*"), tmp);
-                    else parent = new Node(nodeType.div, match("/"), tmp);
+                    if (isMatched("/")) parent = new Node(nodeType.div, match("/"), tmp);
+                    else parent = new Node(nodeType.mult, match("*"), tmp);
                     tmp = mult(null);
                     parent.addChild(tmp);
                 }
@@ -115,7 +118,6 @@ public class Parser {
                     parent = new Node(nodeType.sub, match("-"),tmp);
                 }
             }
-            else {System.out.print("Some wrong");}
             if (!isEnd() && !isMatched(")")){
                 Node tmp = new Node(nodeType.num);
                 tmp = mult(tmp);
@@ -133,6 +135,41 @@ public class Parser {
             parent = summ(parent);
         }
         return parent;
+    }
+
+    private double interpreter(Node head){
+        switch (head.getType()){
+            case num: {
+                return Double.parseDouble(head.getValue());
+            }
+            case add:
+            case mult:
+            case div:
+            case sub:{
+                double left = 0, right = 0;
+                if (head.getChild(0) != null){
+                    left = interpreter(head.getChild(0));
+                }
+                else {System.out.print("invalid operand");}
+                if (head.getChild(1) != null){
+                    right = interpreter(head.getChild(1));
+                }
+                else {System.out.print("invalid operand");}
+                switch (head.getType()){
+                    case add: {return left + right;}
+                    case mult: {return  left * right;}
+                    case div: {
+                        if (right != 0){
+                            return left / right;
+                        }
+                        else System.out.print("Divided by zero");
+                    }
+                    case sub: {return left - right;}
+                }
+            }
+        }
+
+        return 0;
     }
 
 
